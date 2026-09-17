@@ -24,14 +24,25 @@ public class Product {
     @Column(nullable = false)
     private Integer stockQuantity;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     public Product() {
     }
 
-    public Product(String name, String description, BigDecimal price, Integer stockQuantity) {
+    public Product(
+            String name,
+            String description,
+            BigDecimal price,
+            Integer stockQuantity,
+            Category category) {
+
         this.name = name;
         this.description = description;
         this.price = price;
         this.stockQuantity = stockQuantity;
+        this.category = category;
     }
 
     public Long getId() {
@@ -68,5 +79,13 @@ public class Product {
 
     public void setStockQuantity(Integer stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
