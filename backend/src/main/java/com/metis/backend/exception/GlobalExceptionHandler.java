@@ -3,6 +3,7 @@ package com.metis.backend.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,7 +35,8 @@ public class GlobalExceptionHandler {
 
         exception.getBindingResult()
                 .getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage())
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage())
                 );
 
         Map<String, Object> response = new LinkedHashMap<>();
@@ -59,6 +61,35 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(
+            IllegalArgumentException exception) {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("status", 400);
+        response.put("message", exception.getMessage());
+
+        return ResponseEntity
+                .badRequest()
+                .body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(
+            MethodArgumentTypeMismatchException exception) {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("status", 400);
+        response.put("message",
+                "Invalid value for parameter: " + exception.getName());
+
+        return ResponseEntity
+                .badRequest()
                 .body(response);
     }
 }

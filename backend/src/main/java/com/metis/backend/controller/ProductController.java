@@ -2,12 +2,16 @@ package com.metis.backend.controller;
 
 import com.metis.backend.dto.ProductRequest;
 import com.metis.backend.dto.ProductResponse;
+import com.metis.backend.dto.ProductPageResponse;
 import com.metis.backend.service.ProductService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/products")
@@ -58,5 +62,28 @@ public class ProductController {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ProductPageResponse searchProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        return productService.searchProducts(
+                keyword,
+                categoryId,
+                minPrice,
+                maxPrice,
+                page,
+                size,
+                sortBy,
+                direction
+        );
     }
 }

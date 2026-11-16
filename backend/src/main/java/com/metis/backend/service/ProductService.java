@@ -2,13 +2,21 @@ package com.metis.backend.service;
 
 import com.metis.backend.dto.ProductRequest;
 import com.metis.backend.dto.ProductResponse;
+import com.metis.backend.dto.ProductPageResponse;
 import com.metis.backend.entity.Category;
 import com.metis.backend.entity.Product;
+import com.metis.backend.exception.ResourceNotFoundException;
 import com.metis.backend.repository.CategoryRepository;
 import com.metis.backend.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-import com.metis.backend.exception.ResourceNotFoundException;
 
+import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,12 +88,78 @@ public class ProductService {
     }
 
     public boolean deleteProduct(Long id) {
+
         if (!productRepository.existsById(id)) {
             return false;
         }
 
         productRepository.deleteById(id);
         return true;
+    }
+
+    public ProductPageResponse searchProducts(
+            String keyword,
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            int page,
+            int size,
+            String sortBy,
+            String direction) {
+
+        if (minPrice != null && maxPrice != null
+                && minPrice.compareTo(maxPrice) > 0) {
+            throw new IllegalArgumentException(
+                    "Minimum price cannot exceed maximum price"
+            );
+        }
+
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException(
+                    "Invalid pagination parameters"
+            );
+        }
+
+        if (!List.of("id", "name", "price").contains(sortBy)) {
+            throw new IllegalArgumentException("Invalid sort field");
+        }
+
+        Sort.Direction sortDirection =
+                Sort.Direction.fromOptionalString(direction)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Direction must be asc or desc"
+                                ));
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortDirection, sortBy)
+        );
+
+        Specification<Product> specification =
+                ProductSpecificationFilter.search(keyword)
+                        .and(ProductSpecificationFilter.hasCategory(categoryId))
+                        .and(ProductSpecificationFilter.hasPriceBetween(
+                                minPrice, maxPrice
+                        ));
+
+        Page<Product> productPage =
+                productRepository.findAll(specification, pageable);
+
+        List<ProductResponse> products = productPage.getContent()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new ProductPageResponse(
+                products,
+                productPage.getNumber(),
+                productPage.getSize(),
+                productPage.getTotalElements(),
+                productPage.getTotalPages(),
+                productPage.isLast()
+        );
     }
 
     private ProductResponse toResponse(Product product) {
