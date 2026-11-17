@@ -5,6 +5,7 @@ import com.metis.backend.dto.CategoryResponse;
 import com.metis.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CategoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public CategoryResponse createCategory(
             @Valid @RequestBody CategoryRequest request) {
@@ -40,6 +42,7 @@ public class CategoryController {
         return categoryService.createCategory(request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
 

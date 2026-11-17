@@ -5,6 +5,7 @@ import com.metis.backend.dto.ProductSpecificationResponse;
 import com.metis.backend.service.ProductSpecificationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class ProductSpecificationController {
         return specificationService.getSpecifications(productId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ProductSpecificationResponse createSpecification(
             @PathVariable Long productId,
@@ -36,6 +38,7 @@ public class ProductSpecificationController {
         return specificationService.createSpecification(productId, request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ProductSpecificationResponse updateSpecification(
             @PathVariable Long productId,
@@ -45,6 +48,7 @@ public class ProductSpecificationController {
         return specificationService.updateSpecification(productId, id, request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSpecification(
             @PathVariable Long productId,

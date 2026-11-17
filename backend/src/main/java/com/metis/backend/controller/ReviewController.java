@@ -1,13 +1,14 @@
-
 package com.metis.backend.controller;
 
 import com.metis.backend.dto.ProductReviewRequest;
 import com.metis.backend.dto.ProductReviewResponse;
+
 import com.metis.backend.service.ProductReviewService;
 
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,16 +24,22 @@ public class ReviewController {
     @PutMapping("/{reviewId}")
     public ProductReviewResponse updateReview(
             @PathVariable Long reviewId,
-            @Valid @RequestBody ProductReviewRequest request) {
+            @Valid @RequestBody ProductReviewRequest request,
+            Authentication authentication) {
 
-        return reviewService.updateReview(reviewId, request);
+        return reviewService.updateReview(
+                reviewId,
+                request,
+                authentication
+        );
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(
-            @PathVariable Long reviewId) {
+            @PathVariable Long reviewId,
+            Authentication authentication) {
 
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(reviewId, authentication);
 
         return ResponseEntity.noContent().build();
     }

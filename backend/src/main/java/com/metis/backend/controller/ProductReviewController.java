@@ -1,13 +1,14 @@
-
 package com.metis.backend.controller;
 
 import com.metis.backend.dto.ProductReviewRequest;
 import com.metis.backend.dto.ProductReviewResponse;
 import com.metis.backend.dto.ProductReviewSummaryResponse;
+
 import com.metis.backend.service.ProductReviewService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,8 +40,13 @@ public class ProductReviewController {
     @PostMapping
     public ProductReviewResponse createReview(
             @PathVariable Long productId,
-            @Valid @RequestBody ProductReviewRequest request) {
+            @Valid @RequestBody ProductReviewRequest request,
+            Authentication authentication) {
 
-        return reviewService.createReview(productId, request);
+        return reviewService.createReview(
+                productId,
+                request,
+                authentication
+        );
     }
 }

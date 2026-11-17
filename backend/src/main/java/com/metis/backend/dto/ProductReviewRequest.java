@@ -1,4 +1,3 @@
-
 package com.metis.backend.dto;
 
 import jakarta.validation.constraints.Max;
@@ -8,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class ProductReviewRequest {
-
-    @NotBlank(message = "Reviewer name is required")
-    private String reviewerName;
 
     @NotNull(message = "Rating is required")
     @Min(value = 1, message = "Rating must be at least 1")
@@ -22,14 +18,6 @@ public class ProductReviewRequest {
     private String comment;
 
     public ProductReviewRequest() {
-    }
-
-    public String getReviewerName() {
-        return reviewerName;
-    }
-
-    public void setReviewerName(String reviewerName) {
-        this.reviewerName = reviewerName;
     }
 
     public Integer getRating() {

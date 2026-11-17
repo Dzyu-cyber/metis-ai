@@ -1,4 +1,3 @@
-
 package com.metis.backend.entity;
 
 import jakarta.persistence.*;
@@ -30,6 +29,10 @@ public class ProductReview {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private AppUser user;
 
     public ProductReview() {
     }
@@ -99,5 +102,13 @@ public class ProductReview {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
     }
 }
